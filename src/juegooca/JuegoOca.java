@@ -2,7 +2,6 @@ package juegooca;
 import java.util.*;
 public class JuegoOca {
     public static Scanner teclado = new Scanner(System.in);
-    // creamos tablero y creamos jugadores 
     public static TableroOca tablero;
     public static int jugadorActivo = 0; // comienza el jugador 1 que seria la posicion 0 del array
     public static int numeroJugadores;
@@ -11,64 +10,50 @@ public class JuegoOca {
     
     public static void main(String[] args) {
         boolean penalizado;
-        String pause;
         int casillaJugadorActivo, totalDados;
         
-        // Preguntar cuantos jugadores van a jugar 
         numeroJugadores = pedirNumeroJugadores();
-        
-        // creamos tablero y creamos jugadores 
         tablero = new TableroOca(numeroJugadores);
-
-       //debug numero de jugadores 
-        System.out.println("Comienza el juego");
-        System.out.println("numero jugadores "+numeroJugadores);
         
         //creamos el bucle principal
         do {
-
             //mostramos en pantalla jugador activo
             mostrarJugadorActivo(jugadorActivo);
             
             //comprobamos que jugador activo no tenga penalizaciones , si las tiene restamos una penalizacion y cambiamos de jugador activo y si no proseguimos
             penalizado = comprobarPenalizacion(jugadorActivo);
-            
             if(penalizado) despenalizarUnTurno();
             else {
                 do {
-                    //tiramos tiramos los dados
-                    System.out.println("pulsa intro para tirar los dados");
-                    pause = teclado.nextLine();
+                    //tiramos los dados
                     totalDados = tirarDados();
-                    
-                        
-                        // desocupamos la casilla en la que estamos y movemos de casilla a jugador activo
-                        casillaJugadorActivo = tablero.getJugador().get(jugadorActivo).getCasilla();
-                        desocuparCasillaActual(casillaJugadorActivo);
-                        moverJugadorActivo(totalDados);//para probar casillas directamente cambiar este parametro totalDados
 
-                        // comprobamos en que casilla callo
-                        casillaJugadorActivo = tablero.getJugador().get(jugadorActivo).getCasilla();
-                        mostrarDatosCasillaActual(casillaJugadorActivo);
+                    // reseteamos el repetir tirada, desocupamos la casilla en la que estamos y movemos de casilla a jugador activo
+                    repetirTirada = false;
+                    tablero.getJugador().get(jugadorActivo).setrepTirada(repetirTirada);
+                    casillaJugadorActivo = tablero.getJugador().get(jugadorActivo).getCasilla();
+                    desocuparCasillaActual(casillaJugadorActivo);
+                    moverJugadorActivo(totalDados);//para probar casillas directamente cambiar este parametro totalDados
 
-                        // EjecutarOperacionesCasilla
-                        ejecutarOperacionesCasilla(casillaJugadorActivo);
+                    // comprobamos en que casilla cayó
+                    System.out.println("ANTES DE DE ACTUALIZAR CASILLA "+casillaJugadorActivo);
+                    casillaJugadorActivo = tablero.getJugador().get(jugadorActivo).getCasilla();
+                    System.out.println("DESPUES DE ACTUALIZAR CASILLA"+casillaJugadorActivo);
+                    mostrarDatosCasillaActual(casillaJugadorActivo);
+
+                    // EjecutarOperacionesCasilla
+                    ejecutarOperacionesCasilla(casillaJugadorActivo);
                     
                 } while (repetirTirada == true);
-                
-                //cambiamos de jugador
-                    if (jugadorActivo < numeroJugadores - 1) jugadorActivo++;
-                    else jugadorActivo = 0;
-                    
-                    System.out.println();
-                    System.out.println();
-                    System.out.println("*****************************************");
 
-                 
-             } // fin else    
+             } // fin else  
             
+            //cambiamos de jugador
+            System.out.println(finPartida);
+            cambiarJugador();
             // comprobamos si jugador.getCasilla ==  63 damos por terminado el juego
-            
+            finPartida = comprobarFinPartida();
+            System.out.println(finPartida);
         } while(!finPartida); // se va ejecutar mientras ningun jugador gane el juego.
         
     } // fin main
@@ -92,37 +77,42 @@ public class JuegoOca {
     
     public static void despenalizarUnTurno(){
         System.out.println("El jugador esta sancionado");
-                System.out.println("Se procede a restar un turno a la sancion a menos que este en el pozo y a cambiar de jugador");
-                tablero.getJugador().get(jugadorActivo).setTurnosSancionado( tablero.getJugador().get(jugadorActivo).getTurnosSancionado() - 1 );
+        System.out.println("Se procede a restar un turno a la sancion a menos que este en el pozo y a cambiar de jugador");
+        tablero.getJugador().get(jugadorActivo).setTurnosSancionado( tablero.getJugador().get(jugadorActivo).getTurnosSancionado() - 1 );
     }
     
     public static int tirarDados(){
+        String pause;
+        System.out.println("Pulsa intro para tirar los dados");
+        pause = teclado.nextLine();
         int dado1 = tablero.tirarDado();
         int dado2 = tablero.tirarDado();
         int total = dado1 + dado2;
-        System.out.println("RESULTADO DADO1 DEBUG "+ dado1);
-        System.out.println("RESULTADO DADO1 DEBUG "+ dado2);
-        System.out.println("RESULTADO DADOS DEBUG "+ total);
+        System.out.println("RESULTADO DADOS:"+ total);        
         return total;
     }
 
-    
-     public static void moverJugadorActivo(int n){
-         for (int i = 0; i < n; i++) {
-                    // Creamos un bucle para comprobar si pasamos por el pozo y si hay alguien ahi, si es asi lo liberamos del pozo
-                    if( tablero.getJugador().get(jugadorActivo).getCasilla() == 30 && tablero.getCasilla().get(30).isOcupada() == true ) {
-                            for (int j = 0; j < numeroJugadores; j++) {
-                                if( tablero.getJugador().get(i).getCasilla() == 30) tablero.getJugador().get(i).setTurnosSancionado(0);
-                            }
-                        }
-                    tablero.getJugador().get(jugadorActivo).setCasilla(tablero.getJugador().get(jugadorActivo).getCasilla()+1);
-                    }
-                    
-     }
+    public static void moverJugadorActivo(int n){
+        int posMax = tablero.getCasilla().size();
+        int posIni = tablero.getJugador().get(jugadorActivo).getCasilla();
+        int restaAbs = Math.abs(posMax) - Math.abs(posIni);
+        if(posIni + n >= posMax ) n = restaAbs;
+        else restaAbs = n;
+        for (int i = 0; i < restaAbs; i++) {
+            // Creamos un bucle para comprobar si pasamos por el pozo y si hay alguien ahi, si es asi lo liberamos del pozo
+            if( tablero.getJugador().get(jugadorActivo).getCasilla() == 30 && tablero.getCasilla().get(30).isOcupada() == true ) {
+                for (int j = 0; j < numeroJugadores; j++) {
+                    if( tablero.getJugador().get(i).getCasilla() == 30) tablero.getJugador().get(i).setTurnosSancionado(0);
+                }
+            }
+            tablero.getJugador().get(jugadorActivo).setCasilla(tablero.getJugador().get(jugadorActivo).getCasilla()+1);
+            System.out.println("ahora estoy en la casilla "+tablero.getJugador().get(jugadorActivo).getCasilla());
+        }
+    }
     
     public static void mostrarDatosCasillaActual(int n){
         // mostramos en que casilla sa acaba de caer
-        System.out.println("La casilla actual es la numero: "+tablero.getCasilla().get(n).getNumCasilla());
+     /*   System.out.println("La casilla actual es la numero: "+tablero.getCasilla().get(n).getNumCasilla());
         System.out.println("El nombre de la casilla actual es: "+tablero.getCasilla().get(n).getDescripcion());
         if (tablero.getCasilla().get(n).getTurnosQueSanciona() == 9999) System.out.println("Hemos caido en el pozo y no podemos salir hasta que pase otro jugador por esta casilla");
         else System.out.println("Sanciona al Jugador "+tablero.getCasilla().get(n).getTurnosQueSanciona()+" turnos.");
@@ -130,7 +120,7 @@ public class JuegoOca {
         else System.out.println("La casilla no esta ocupada por ningun otro jugador");
         System.out.println("La casilla acutal nos hace avanzar con un salto de: "+tablero.getCasilla().get(n).getSalto()+" casillas.");
         if (tablero.getCasilla().get(n).isRepetirTirada() == true) System.out.println("Como la casilla es especial volvemos a tirar");
-        else System.out.println("No podemos repetir tirada");
+        else System.out.println("No podemos repetir tirada");*/
     }
     
     public static boolean comprobarOca(int n){
@@ -145,7 +135,7 @@ public class JuegoOca {
     
     public static void ejecutarOperacionesCasilla(int n){
         System.out.println("La casilla actual es la numero: "+tablero.getCasilla().get(n).getNumCasilla());
-        System.out.println("La casilla acutal es" + tablero.getCasilla().get(n).getDescripcion() );
+        System.out.println("La casilla acutal es: " + tablero.getCasilla().get(n).getDescripcion() );
         int nuevaN = n + tablero.getCasilla().get(n).getSalto();
         switch (n){
             case 4:
@@ -246,13 +236,12 @@ public class JuegoOca {
             case 62: 
                 finPartida = true;
                 System.out.println("El "+tablero.getJugador().get(jugadorActivo).getNombre()+" ha ganado el juego de la Oca.");
-                repetirTirada = false;
+                repetirTirada = true;
                 break;
             default: break;
         }
         
     }
-    
     
     public static void operacionesDeJugadorEnCasilla(int n){
         //igualamos las casillas
@@ -263,7 +252,6 @@ public class JuegoOca {
         marcarCasillaOcupada(n);
         // igualar repetir tirada 
         igualarRepetirTirada(n);
-        
     }
     
     public static void igualarRepetirTirada(int n){
@@ -301,6 +289,18 @@ public class JuegoOca {
     public static boolean comprobarPenalizacion(int j){
         if (tablero.getJugador().get(j).getTurnosSancionado() > 0) return true;
         else return false;
+    }
+    
+    public static boolean comprobarFinPartida(){
+        if(tablero.getJugador().get(jugadorActivo).getCasilla() == tablero.getJugador().size()) return true;
+        else return false;
+    }
+    
+    public static void cambiarJugador(){
+        if (jugadorActivo < numeroJugadores - 1) jugadorActivo++;
+        else jugadorActivo = 0;
+        System.out.println();
+        System.out.println("*****************************************");
     }
     
     public static void pausarTresSegundos(){

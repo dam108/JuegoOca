@@ -24,19 +24,16 @@ public class TableroOca {
         int res1 = n - var2; 
         return (var1 + res1);
     }
-    
     private void crearJugadores(int nJ){
         // creamos jugadores
         for (int i = 0; i < nJ; i++) {
             jugador.add(i, new Jugadores(i+1));
         }
     }
-    
     public int tirarDado(){
         int resultado = (int)(Math.random()*6)+1;
         return resultado;
     }
-    
     private void crearCasillas(){
         // creamos casillas
         for (int i = 0; i < CAS_FINAL; i++) {
@@ -66,30 +63,25 @@ public class TableroOca {
         casilla.set (25, new Casillas(25+1, "Dados", 0, calcularSaltoCasillaDados(25+1) , false));
         casilla.set (52, new Casillas(52+1, "Dados", 0, calcularSaltoCasillaDados(52+1) , false));
         casilla.set (57, new Casillas(57+1, "Calavera", 0, -57 , false));
-        // hacer casilla final mas tarde
-        casilla.set ( 62, new Casillas(62+1, "Casilla Final", 0, /*calcuarRebote(),*/ false));
+        casilla.set ( 62, new Casillas(62+1, "Casilla Final", 0, false));
     }
-    
-    
+
     /* FIN METODOS */
+    
     /* GETTERS Y SETTERS */
     
     public ArrayList<Casillas> getCasilla() {
         return casilla;
     }
-
     public void setCasilla(ArrayList<Casillas> casilla) {
         this.casilla = casilla;
     }
-
     public ArrayList<Jugadores> getJugador() {
         return jugador;
     }
-
     public void setJugador(ArrayList<Jugadores> jugador) {
         this.jugador = jugador;
     }
-    
     /* FIN GETTERS Y SETTERS */
     
 }

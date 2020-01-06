@@ -42,47 +42,36 @@ public class Casillas {
     public int getNumCasilla() {
         return numCasilla;
     }
-
     public void setNumCasilla(int numCasilla) {
         this.numCasilla = numCasilla;
     }
-
     public String getDescripcion() {
         return Descripcion;
     }
-
     public void setDescripcion(String Descripcion) {
         this.Descripcion = Descripcion;
     }
-
     public int getTurnosQueSanciona() {
         return turnosQueSanciona;
     }
-
     public void setTurnosQueSanciona(int turnosQueSanciona) {
         this.turnosQueSanciona = turnosQueSanciona;
     }
-
     public boolean isOcupada() {
         return ocupada;
     }
-
     public void setOcupada(boolean ocupada) {
         this.ocupada = ocupada;
     }
-
     public int getSalto() {
         return salto;
     }
-
     public void setSalto(int salto) {
         this.salto = salto;
     }
-
     public boolean isRepetirTirada() {
         return repetirTirada;
     }
-
     public void setRepetirTirada(boolean repetirTirada) {
         this.repetirTirada = repetirTirada;
     }

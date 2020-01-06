@@ -22,23 +22,18 @@ public class Jugadores {
     public String getNombre() {
         return nombre;
     }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
     public int getCasilla() {
         return casilla;
     }
-
     public void setCasilla(int casilla) {
         this.casilla = casilla;
     }
-
     public int getTurnosSancionado() {
         return turnosSancionado;
     }
-
     public void setTurnosSancionado(int turnosSancionado) {
         this.turnosSancionado = turnosSancionado;
     }
